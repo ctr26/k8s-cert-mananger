@@ -1,0 +1,35 @@
+metadata:
+  maintainer: "Craig Russell ctr26@ebi.ac.uk"
+
+helmRepos:
+  nginx-stable: "https://helm.nginx.com/stable"
+  ingress-nginx: "https://kubernetes.github.io/ingress-nginx"
+# settings:
+apps:
+  cert-manager:
+    name: "cert-manager"
+    chart: "jetstack/cert-manager"
+    enabled: true
+    priority: 0
+    # timeout: 120
+    version: "v1.4.2"
+    wait: true
+    group: "production"
+    namespace: "cert-manager"
+    set:
+      installCRDs: true
+      ingressShim.defaultIssuerKind: "ClusterIssuer"
+      ingressShim.defaultIssuerName: "letsencrypt-production"
+    hooks:
+      postUpgrade: "cert-managment/cluster_issuer/values.yaml"
+      postInstall: "cert-managment/cluster_issuer/values.yaml"
+
+  ingress-nginx:
+    name: "ingress-nginx"
+    namespace: "ingress-nginx"
+    chart: "ingress-nginx/ingress-nginx"
+    group: "production"
+    enabled: true
+    version: "3.35.0"
+    valuesFiles:
+      - ingress/nginx-ingress.yaml
